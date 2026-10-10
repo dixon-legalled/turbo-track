@@ -117,6 +117,24 @@ h3{font-family:var(--display);font-weight:400;font-size:20px;margin:0;color:var(
 .field label{font-family:var(--display);font-size:20px}
 #name-input{font:inherit;font-size:20px;font-weight:700;color:var(--paper);background:rgba(0,0,0,.25);border:2px solid var(--line);border-radius:14px;padding:10px 14px;width:100%;-webkit-user-select:text;user-select:text}
 #name-input::placeholder{color:var(--paper);opacity:.45}
+#name-input[readonly]{cursor:pointer;-webkit-user-select:none;user-select:none}
+
+/* In-game keyboard: touch devices use this instead of the system keyboard, which iOS would show in portrait */
+.kbd{position:absolute;inset:0;z-index:8;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.4);
+  padding:0 max(12px,var(--sa-r)) max(10px,var(--sa-b)) max(12px,var(--sa-l))}
+.kbd-panel{width:100%;max-width:760px;background:var(--ink-2);border-radius:22px;padding:12px;display:flex;flex-direction:column;gap:8px;box-shadow:0 -6px 0 rgba(0,0,0,.25)}
+.kbd-top{display:flex;align-items:center;gap:12px}
+.kbd-label{font-family:var(--display);font-size:16px;opacity:.85;flex:none}
+#kbd-out{flex:1;min-width:0;font-family:var(--display);font-size:26px;line-height:1.2;background:rgba(0,0,0,.25);border-radius:12px;padding:6px 12px;color:var(--paper);white-space:nowrap;overflow:hidden}
+#kbd-out::after{content:"";display:inline-block;width:3px;height:1em;margin-left:2px;vertical-align:-.12em;background:var(--sun);animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.kbd-keys{display:flex;flex-direction:column;gap:6px}
+.kbd-row{display:flex;gap:6px;justify-content:center}
+.key{flex:1 1 0;max-width:64px;height:clamp(36px,11cqh,52px);border:0;border-radius:10px;background:var(--paper);color:var(--ink);font-family:var(--display);font-size:20px;box-shadow:0 3px 0 rgba(0,0,0,.3);padding:0}
+.key:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.3)}
+.key.mid{flex:1.6 1 0;max-width:110px;font-size:16px}
+.key.wide{flex:5 1 0;max-width:none;font-size:16px}
+.key.done{background:var(--sun)}
 
 .track-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .track-card{display:flex;flex-direction:column;background:var(--glass);border:3px solid transparent;border-radius:22px;padding:0;overflow:hidden;text-align:left;min-width:0}
@@ -250,6 +268,13 @@ h3{font-family:var(--display);font-weight:400;font-size:20px;margin:0;color:var(
     <div class="progress" id="progress"><span class="flag"></span></div>
   </div>
   <div id="countdown"></div>
+
+  <div id="kbd" class="kbd" hidden>
+    <div class="kbd-panel" role="dialog" aria-label="Type your name">
+      <div class="kbd-top"><span class="kbd-label">Driver name</span><output id="kbd-out"></output></div>
+      <div id="kbd-keys" class="kbd-keys"></div>
+    </div>
+  </div>
 
   <section id="scr-title" class="screen">
     <div class="panel title-panel">
@@ -1312,6 +1337,33 @@ function refreshGarage(){
 }
 $('#name-input').addEventListener('input', e => { settings.name = e.target.value.slice(0, 12); save(); applyTheme(); });
 $('#name-input').addEventListener('keydown', e => { if (e.key === 'Enter') e.target.blur(); });
+
+// In-game keyboard for touch devices, so typing a name stays in landscape like the rest of the game.
+const kbd = { el:$('#kbd'), out:$('#kbd-out'), val:'' };
+function setName(v){ kbd.val = v; settings.name = v.trim(); save(); applyTheme(); $('#name-input').value = v; kbd.out.textContent = v; }
+function openKbd(){ kbd.val = settings.name; kbd.out.textContent = kbd.val; kbd.el.hidden = false; }
+function closeKbd(){ setName(kbd.val.trim()); kbd.el.hidden = true; }
+function kbdPress(k){
+  let v = kbd.val;
+  if (k === 'back') v = v.slice(0, -1);
+  else if (k === 'done') return closeKbd();
+  else if (k === 'space'){ if (v && !v.endsWith(' ') && v.length < 12) v += ' '; }
+  else if (v.length < 12) v += (v === '' || v.endsWith(' ')) ? k : k.toLowerCase();
+  setName(v);
+}
+(function buildKbd(){
+  const rows = [[...'QWERTYUIOP'], [...'ASDFGHJKL'], [...'ZXCVBNM', 'back'], ['space', 'done']];
+  const label = { back:'⌫ Delete', space:'Space', done:'Done' };
+  $('#kbd-keys').innerHTML = rows.map(r => `<div class="kbd-row">${r.map(k =>
+    `<button class="key${k === 'space' ? ' wide' : k.length > 1 ? ' mid' : ''}${k === 'done' ? ' done' : ''}" data-k="${k}" aria-label="${label[k] || k}">${label[k] || k}</button>`).join('')}</div>`).join('');
+  $('#kbd-keys').addEventListener('click', e => { const b = e.target.closest('.key'); if (b) kbdPress(b.dataset.k); });
+  kbd.el.addEventListener('click', e => { if (e.target === kbd.el) closeKbd(); });
+  if (matchMedia('(pointer: coarse)').matches){
+    const ni = $('#name-input');
+    ni.readOnly = true; ni.setAttribute('inputmode', 'none'); ni.placeholder = 'Tap to type your name';
+    ni.addEventListener('click', openKbd);
+  }
+})();
 
 // tracks
 const thumbObs = {};
