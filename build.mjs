@@ -23,7 +23,8 @@ const html = `<!doctype html>
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <style>
-html{padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)}
+/* Full-bleed: the race runs under the notch; the HUD, buttons and menus keep clear of it themselves. */
+html{padding:0}
 body{margin:0}
 </style>
 ${headPart.trim()}
@@ -46,7 +47,7 @@ const manifest = {
   start_url: './',
   scope: './',
   display: 'standalone',
-  orientation: 'portrait',
+  orientation: 'any',
   background_color: INK,
   theme_color: INK,
   icons: [
