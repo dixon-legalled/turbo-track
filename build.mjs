@@ -47,7 +47,7 @@ const manifest = {
   start_url: './',
   scope: './',
   display: 'standalone',
-  orientation: 'any',
+  orientation: 'landscape',
   background_color: INK,
   theme_color: INK,
   icons: [
