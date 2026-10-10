@@ -22,7 +22,12 @@ html{height:100%;box-sizing:border-box;background:var(--ink)}
 [hidden]{display:none!important}
 body{height:100%;margin:0;overflow:hidden;background:var(--ink);color:var(--paper);font-family:var(--body);font-size:17px;
   -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;overscroll-behavior:none}
-#app{position:relative;width:100%;height:100%;overflow:hidden}
+#app{position:relative;width:100%;height:100%;overflow:hidden;container-type:size;
+  --sa-t:env(safe-area-inset-top,0px);--sa-r:env(safe-area-inset-right,0px);--sa-b:env(safe-area-inset-bottom,0px);--sa-l:env(safe-area-inset-left,0px)}
+/* A phone held upright still gets the landscape game: the whole app is drawn a quarter turn clockwise,
+   so the safe-area edges move round with it. Width and height are set in pixels by resize(). */
+#app.turned{position:fixed;top:0;left:0;transform-origin:0 0;transform:rotate(90deg) translateY(-100%);
+  --sa-t:env(safe-area-inset-right,0px);--sa-r:env(safe-area-inset-bottom,0px);--sa-b:env(safe-area-inset-left,0px);--sa-l:env(safe-area-inset-top,0px)}
 #game{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:0}
 #touch{position:absolute;inset:0;z-index:1;touch-action:none}
 button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
@@ -30,18 +35,18 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--paper);outline-
 
 /* ---------- screens ---------- */
 .screen{position:absolute;inset:0;z-index:5;display:flex;overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--scrim);
-  padding:max(12px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(12px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+  padding:max(12px,var(--sa-t)) max(16px,var(--sa-r)) max(12px,var(--sa-b)) max(16px,var(--sa-l))}
 .screen>.panel{margin:auto;width:100%;max-width:640px;display:flex;flex-direction:column;gap:14px}
 .box{background:var(--ink-2);border-radius:28px;padding:18px;box-shadow:0 10px 0 rgba(0,0,0,.32)}
 
 .tp-brand,.tp-actions{display:flex;flex-direction:column;align-items:center;gap:14px}
 .logo{font-family:var(--display);text-transform:uppercase;line-height:.86;transform:skew(-9deg);text-align:center;margin:0}
-.logo span{display:block;letter-spacing:.01em;font-size:clamp(52px,min(19vw,9.5vh),128px)}
+.logo span{display:block;letter-spacing:.01em;font-size:clamp(52px,min(19cqw,9.5cqh),128px)}
 .logo .l1{color:var(--sun);text-shadow:0 6px 0 var(--hot),0 13px 0 rgba(0,0,0,.35)}
 .logo .l2{color:var(--paper);text-shadow:0 6px 0 var(--ink-2),0 13px 0 rgba(0,0,0,.35)}
 .checker{height:18px;width:min(260px,70%);margin:4px auto 0;transform:skew(-9deg);border-radius:3px;
   background:repeating-conic-gradient(#fff 0 25%,#16161c 0 50%) 0 0/18px 18px}
-.greet{font-family:var(--display);font-size:clamp(24px,6.4vw,36px);color:var(--sun);text-align:center;margin:0;text-wrap:balance;
+.greet{font-family:var(--display);font-size:clamp(24px,6.4cqw,36px);color:var(--sun);text-align:center;margin:0;text-wrap:balance;
   text-shadow:0 3px 0 rgba(0,0,0,.3)}
 .title-panel{align-items:center;text-align:center}
 .hint{margin:0;max-width:30ch;line-height:1.35;opacity:.9;text-wrap:balance}
@@ -64,7 +69,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--paper);outline-
 .toggle[aria-pressed="true"] .sw::after{transform:translateX(20px)}
 
 .bar{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.bar h2{font-family:var(--display);font-weight:400;font-size:clamp(24px,6vw,32px);margin:0;color:var(--sun);text-align:center;flex:1}
+.bar h2{font-family:var(--display);font-weight:400;font-size:clamp(24px,6cqw,32px);margin:0;color:var(--sun);text-align:center;flex:1}
 .btn-back{background:var(--glass);border:2px solid var(--line);border-radius:14px;padding:6px 14px;font-weight:800;font-size:17px;min-width:84px}
 .coin-total{display:flex;align-items:center;gap:6px;font-family:var(--display);font-size:18px;min-width:84px;justify-content:flex-end;font-variant-numeric:tabular-nums}
 .coin-total svg,.hud-pill svg.coin{width:22px;height:22px}
@@ -110,7 +115,7 @@ h3{font-family:var(--display);font-weight:400;font-size:20px;margin:0;color:var(
 
 /* ---------- HUD ---------- */
 #hud{position:absolute;left:0;right:0;top:0;z-index:3;pointer-events:none;display:flex;flex-direction:column;gap:8px;
-  padding:calc(8px + env(safe-area-inset-top,0px)) calc(12px + env(safe-area-inset-right,0px)) 8px calc(12px + env(safe-area-inset-left,0px))}
+  padding:calc(8px + var(--sa-t)) calc(12px + var(--sa-r)) 8px calc(12px + var(--sa-l))}
 .hud-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
 .hud-pill{display:flex;align-items:center;gap:4px;background:rgba(10,12,30,.55);border-radius:999px;padding:6px 12px;font-family:var(--display);font-size:20px;color:#fff;font-variant-numeric:tabular-nums}
 #hearts svg{width:22px;height:22px}
@@ -127,37 +132,32 @@ h3{font-family:var(--display);font-weight:400;font-size:20px;margin:0;color:var(
 .progress .dot.me{width:20px;height:20px;margin:-10px 0 0 -10px;border:3px solid #fff;z-index:2;box-shadow:0 0 0 2px rgba(0,0,0,.35)}
 
 #pads{position:absolute;inset:0;z-index:2;pointer-events:none}
-.pad{position:absolute;bottom:calc(16px + env(safe-area-inset-bottom,0px));width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.16);border:3px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;transition:background .08s,transform .08s}
+.pad{position:absolute;bottom:calc(16px + var(--sa-b));width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.16);border:3px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;transition:background .08s,transform .08s}
 .pad svg{width:40px;height:40px;fill:#fff;opacity:.85}
-.pad.left{left:calc(16px + env(safe-area-inset-left,0px))}.pad.right{right:calc(16px + env(safe-area-inset-right,0px))}
+.pad.left{left:calc(16px + var(--sa-l))}.pad.right{right:calc(16px + var(--sa-r))}
 /* Landscape race: the road runs up the middle; the HUD sits in the scenery on either side so it never covers the road. */
-@media (orientation:landscape){
-  .pad{width:88px;height:88px}
-  #hud{bottom:0;padding-bottom:calc(10px + env(safe-area-inset-bottom,0px))}
-  .hud-top{display:grid;grid-template-columns:auto 1fr auto;grid-template-areas:"hearts . right" "pos . .";row-gap:6px}
-  #hearts{grid-area:hearts}
-  .hud-pos{grid-area:pos;justify-self:start;padding-left:6px}
-  .hud-right{grid-area:right}
-  .progress{position:absolute;right:calc(34px + env(safe-area-inset-right,0px));top:calc(84px + env(safe-area-inset-top,0px));bottom:calc(132px + env(safe-area-inset-bottom,0px));width:12px;height:auto;margin:0}
-  .progress .flag{top:-16px;right:-5px}
-  .progress .dot{left:50% !important;top:auto;bottom:calc(var(--p,0) * 1%);margin:0 0 -7px -7px}
-  .progress .dot.me{margin:0 0 -10px -10px}
-}
-#rotate{position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px;background:var(--ink);text-align:center}
-#rotate svg{width:120px;height:120px;color:var(--paper);animation:turn 2.4s ease-in-out infinite}
-#rotate p{margin:0;font-family:var(--display);font-size:28px;color:var(--sun);text-wrap:balance}
-@keyframes turn{0%,25%{transform:rotate(0)}55%,100%{transform:rotate(-90deg)}}
+/* .land / .short are set on #app by resize() from the game's own frame, which may be turned (see #app.turned). */
+#app.land .pad{width:88px;height:88px}
+#app.land #hud{bottom:0;padding-bottom:calc(10px + var(--sa-b))}
+#app.land .hud-top{display:grid;grid-template-columns:auto 1fr auto;grid-template-areas:"hearts . right" "pos . .";row-gap:6px}
+#app.land #hearts{grid-area:hearts}
+#app.land .hud-pos{grid-area:pos;justify-self:start;padding-left:6px}
+#app.land .hud-right{grid-area:right}
+#app.land .progress{position:absolute;right:calc(34px + var(--sa-r));top:calc(84px + var(--sa-t));bottom:calc(132px + var(--sa-b));width:12px;height:auto;margin:0}
+#app.land .progress .flag{top:-16px;right:-5px}
+#app.land .progress .dot{left:50%;top:auto;bottom:calc(var(--p,0) * 1%);margin:0 0 -7px -7px}
+#app.land .progress .dot.me{margin:0 0 -10px -10px}
 .pad.on{background:rgba(255,255,255,.42);transform:scale(.93)}
 
 #countdown{position:absolute;inset:0;z-index:4;display:flex;align-items:center;justify-content:center;pointer-events:none;
-  font-family:var(--display);font-size:clamp(110px,34vw,200px);color:var(--sun);text-shadow:0 8px 0 var(--hot),0 16px 0 rgba(0,0,0,.35)}
+  font-family:var(--display);font-size:clamp(110px,34cqw,200px);color:var(--sun);text-shadow:0 8px 0 var(--hot),0 16px 0 rgba(0,0,0,.35)}
 #countdown.pop{animation:pop .9s ease-out forwards}
 @keyframes pop{0%{transform:scale(2.2);opacity:0}18%{transform:scale(1);opacity:1}75%{opacity:1}100%{transform:scale(.85);opacity:0}}
 
 /* ---------- results / pause ---------- */
 .results{align-items:center;text-align:center}
 .r-head,.r-body{display:flex;flex-direction:column;align-items:center;gap:12px;width:100%}
-.place{font-family:var(--display);font-size:clamp(72px,min(26vw,15vh),150px);line-height:.9;color:var(--sun);text-shadow:0 7px 0 var(--hot),0 14px 0 rgba(0,0,0,.35);transform:skew(-8deg)}
+.place{font-family:var(--display);font-size:clamp(72px,min(26cqw,15cqh),150px);line-height:.9;color:var(--sun);text-shadow:0 7px 0 var(--hot),0 14px 0 rgba(0,0,0,.35);transform:skew(-8deg)}
 .place sup{font-size:.4em;vertical-align:super}
 .res-msg{margin:0;font-size:21px;font-weight:800;text-wrap:balance}
 .stars{display:flex;gap:6px;justify-content:center}
@@ -175,44 +175,45 @@ h3{font-family:var(--display);font-weight:400;font-size:20px;margin:0;color:var(
 
 @media (prefers-reduced-motion: reduce){ #countdown.pop{animation-duration:.01s} .btn,.pad,.sw::after{transition:none} }
 /* phone held sideways: put things side by side so nothing needs scrolling */
-@media (orientation:landscape) and (max-height:600px){
-  .screen>.panel{max-width:920px;gap:10px}
-  .box{padding:12px 18px;border-radius:24px}
-  .btn-big{font-size:26px;padding:12px 40px}
-  .btn{font-size:19px;padding:11px 20px}
-  .bar h2{font-size:24px}
-  .screen>.title-panel{flex-direction:row;justify-content:center;gap:32px}
-  .tp-brand,.tp-actions{flex:1;min-width:0;gap:10px}
-  .logo span{font-size:min(11vw,19vh)}
-  .screen>.garage{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);column-gap:18px;row-gap:8px;align-items:start;
-    grid-template-areas:"bar bar" "cars paint" "cars name" "cars go"}
-  .g-bar{grid-area:bar}.g-cars{grid-area:cars}.g-paint{grid-area:paint;gap:6px}.g-name{grid-area:name;gap:4px}.g-go{grid-area:go;align-self:end}
-  .g-name label,h3{font-size:17px}
-  #name-input{font-size:17px;padding:7px 12px}
-  .car-card{padding:8px 8px 10px}
-  .car-card canvas{aspect-ratio:auto;height:24vh}
-  .car-card .blurb{font-size:13px;min-height:0}
-  .swatches{gap:8px;max-width:340px}
-  .track-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
-  .tc-info{padding:8px 10px 10px}
-  .tc-info b{font-size:16px}
-  .screen>.results{flex-direction:row;gap:28px}
-  .r-head,.r-body{flex:1;min-width:0;gap:10px}
-  .place{font-size:min(24vw,28vh)}
-  .stars svg{width:40px;height:40px}
-  .pause-panel{gap:10px}
-}
-/* small portrait phones */
-@media (orientation:portrait) and (max-height:700px){
-  .box{padding:14px}
-  .screen>.panel{gap:10px}
-  .btn-big{font-size:26px;padding:12px 40px}
-  .car-card .blurb{display:none}
-}
+/* phone sideways (short landscape frame): put things side by side so nothing needs scrolling */
+#app.land.short .screen>.panel{max-width:920px;gap:10px}
+#app.land.short .box{padding:12px 18px;border-radius:24px}
+#app.land.short .btn-big{font-size:26px;padding:12px 40px}
+#app.land.short .btn{font-size:19px;padding:11px 20px}
+#app.land.short .bar h2{font-size:24px}
+#app.land.short .screen>.title-panel{flex-direction:row;justify-content:center;gap:32px}
+#app.land.short .tp-brand,#app.land.short .tp-actions{flex:1;min-width:0;gap:10px}
+#app.land.short .logo span{font-size:min(11cqw,19cqh)}
+#app.land.short .screen>.garage{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);column-gap:18px;row-gap:8px;align-items:start;
+  grid-template-areas:"bar bar" "cars paint" "cars name" "cars go"}
+#app.land.short .g-bar{grid-area:bar}
+#app.land.short .g-cars{grid-area:cars}
+#app.land.short .g-paint{grid-area:paint;gap:6px}
+#app.land.short .g-name{grid-area:name;gap:4px}
+#app.land.short .g-go{grid-area:go;align-self:end}
+#app.land.short .g-name label,#app.land.short h3{font-size:17px}
+#app.land.short #name-input{font-size:17px;padding:7px 12px}
+#app.land.short .car-card{padding:8px 8px 10px}
+#app.land.short .car-card canvas{aspect-ratio:auto;height:24cqh}
+#app.land.short .car-card .blurb{font-size:13px;min-height:0}
+#app.land.short .swatches{gap:8px;max-width:340px}
+#app.land.short .track-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+#app.land.short .tc-info{padding:8px 10px 10px}
+#app.land.short .tc-info b{font-size:16px}
+#app.land.short .screen>.results{flex-direction:row;gap:28px}
+#app.land.short .r-head,#app.land.short .r-body{flex:1;min-width:0;gap:10px}
+#app.land.short .place{font-size:min(24cqw,28cqh)}
+#app.land.short .stars svg{width:40px;height:40px}
+#app.land.short .pause-panel{gap:10px}
+/* short portrait frame (only a narrow desktop window) */
+#app.port.short .box{padding:14px}
+#app.port.short .screen>.panel{gap:10px}
+#app.port.short .btn-big{font-size:26px;padding:12px 40px}
+#app.port.short .car-card .blurb{display:none}
 </style>
 
 <div id="app">
-  <div id="safe-probe" style="position:absolute;top:0;left:0;width:1px;height:env(safe-area-inset-top,0px);visibility:hidden;pointer-events:none"></div>
+  <div id="safe-probe" style="position:absolute;top:0;left:0;width:1px;height:var(--sa-t);visibility:hidden;pointer-events:none"></div>
   <canvas id="game"></canvas>
   <div id="touch"></div>
   <div id="pads" hidden>
@@ -231,10 +232,6 @@ h3{font-family:var(--display);font-weight:400;font-size:20px;margin:0;color:var(
     <div class="progress" id="progress"><span class="flag"></span></div>
   </div>
   <div id="countdown"></div>
-  <div id="rotate" hidden>
-    <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"><rect x="20" y="6" width="24" height="52" rx="5"/><circle cx="32" cy="50" r="2" fill="currentColor"/></svg>
-    <p>Turn your phone sideways to play</p>
-  </div>
 
   <section id="scr-title" class="screen">
     <div class="panel title-panel">
@@ -976,7 +973,11 @@ function startRace(trackId){
 
 /* ================= input ================= */
 const touch = $('#touch'), pointers = new Map(), keys = { left:false, right:false };
-function sideOf(e){ const r = touch.getBoundingClientRect(); return (e.clientX - r.left) < r.width / 2 ? -1 : 1; }
+function sideOf(e){
+  const r = touch.getBoundingClientRect();   // on-screen box; when the app is turned, its left edge is the top of the screen
+  const along = view.turned ? (e.clientY - r.top) / r.height : (e.clientX - r.left) / r.width;
+  return along < .5 ? -1 : 1;
+}
 touch.addEventListener('pointerdown', e => { e.preventDefault(); try { touch.setPointerCapture(e.pointerId); } catch(_){} pointers.set(e.pointerId, sideOf(e)); updPads(); });
 touch.addEventListener('pointermove', e => { if (pointers.has(e.pointerId)){ pointers.set(e.pointerId, sideOf(e)); updPads(); } });
 ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(ev => touch.addEventListener(ev, e => { pointers.delete(e.pointerId); updPads(); }));
@@ -1357,13 +1358,17 @@ document.addEventListener('visibilitychange', () => {
   else if (Sound.ctx) Sound.ctx.resume().catch(() => {});
 });
 function resize(){
-  const r = app.getBoundingClientRect();
-  view.w = Math.max(200, r.width); view.h = Math.max(200, r.height); view.dpr = Math.min(2, window.devicePixelRatio || 1);
+  // Phones and tablets always get the landscape game: held upright, the whole app is drawn turned (see #app.turned).
+  const turn = matchMedia('(pointer: coarse)').matches && window.innerHeight > window.innerWidth;
+  app.classList.toggle('turned', turn);
+  app.style.width = turn ? window.innerHeight + 'px' : '';
+  app.style.height = turn ? window.innerWidth + 'px' : '';
+  view.turned = turn;
+  view.w = Math.max(200, app.offsetWidth); view.h = Math.max(200, app.offsetHeight); view.dpr = Math.min(2, window.devicePixelRatio || 1);
+  const land = view.w > view.h;
+  app.classList.toggle('land', land); app.classList.toggle('port', !land);
+  app.classList.toggle('short', land ? view.h <= 600 : view.h <= 700);
   view.safeTop = $('#safe-probe').offsetHeight || 0;
-  // Phones and tablets play in landscape only.
-  const turn = matchMedia('(pointer: coarse)').matches && view.h > view.w;
-  $('#rotate').hidden = !turn;
-  if (turn && (G.state === 'race' || G.state === 'countdown')) pauseGame();
   cv.width = Math.round(view.w * view.dpr); cv.height = Math.round(view.h * view.dpr);
   if (!screens.garage.hidden) refreshGarage();
   if (!screens.tracks.hidden) refreshTracks();
@@ -1380,7 +1385,9 @@ function start(data){
   if (window.claude && window.claude.hot && window.claude.hot.snapshot) window.claude.hot.snapshot(() => ({ settings }));
   buildTrackCards();
   resize();
-  if ('ResizeObserver' in window) new ResizeObserver(resize).observe(app); else window.addEventListener('resize', resize);
+  if ('ResizeObserver' in window) new ResizeObserver(resize).observe(app);
+  window.addEventListener('resize', resize);
+  window.addEventListener('orientationchange', () => setTimeout(resize, 120));
   applyTheme();
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   let topLevel = true; try { topLevel = window.top === window; } catch(e){ topLevel = false; }
