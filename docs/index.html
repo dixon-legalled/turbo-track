@@ -1356,6 +1356,36 @@ function applyTheme(){
 }
 
 $('#btn-play').onclick = () => show('garage');
+
+// Hidden screen-size readout for diagnosing layout gaps on real devices: tap the logo 5 times. Tap it to close.
+(function(){
+  let taps = 0, timer = 0;
+  $('.logo').addEventListener('click', () => {
+    taps++; clearTimeout(timer); timer = setTimeout(() => taps = 0, 2000);
+    if (taps < 5) return;
+    taps = 0;
+    const probe = document.createElement('div');
+    probe.style.cssText = 'position:fixed;visibility:hidden;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)';
+    document.body.appendChild(probe);
+    const cs = getComputedStyle(probe), vv = window.visualViewport, ar = app.getBoundingClientRect();
+    const lines = [
+      `window ${innerWidth} x ${innerHeight}`,
+      `visual ${vv ? Math.round(vv.width) + ' x ' + Math.round(vv.height) + ' top ' + Math.round(vv.offsetTop) : '-'}`,
+      `client ${document.documentElement.clientWidth} x ${document.documentElement.clientHeight}`,
+      `screen ${screen.width} x ${screen.height}  dpr ${devicePixelRatio}`,
+      `safe t${cs.paddingTop} r${cs.paddingRight} b${cs.paddingBottom} l${cs.paddingLeft}`,
+      `app ${Math.round(ar.left)},${Math.round(ar.top)} ${Math.round(ar.width)} x ${Math.round(ar.height)}  turned ${!!view.turned}`,
+      `home-screen ${navigator.standalone === true} / ${matchMedia('(display-mode: standalone)').matches}`,
+      navigator.userAgent.replace(/^Mozilla\/5\.0 /, ''),
+    ];
+    probe.remove();
+    const d = document.createElement('pre');
+    d.style.cssText = 'position:fixed;left:12px;right:12px;top:40%;z-index:99;margin:0;padding:14px;border-radius:14px;background:rgba(0,0,0,.85);color:#7CFFB2;font:14px/1.5 ui-monospace,Menlo,monospace;white-space:pre-wrap;-webkit-user-select:text;user-select:text';
+    d.textContent = lines.join('\n');
+    d.onclick = () => d.remove();
+    document.body.appendChild(d);
+  });
+})();
 $('#tg-bday').onclick = () => { settings.bday = !settings.bday; save(); applyTheme(); };
 $('#tg-sound').onclick = () => { settings.sound = !settings.sound; save(); Sound.ensure(); Sound.setOn(settings.sound); applyTheme(); };
 document.querySelectorAll('[data-go]').forEach(b => b.onclick = () => show(b.dataset.go));
