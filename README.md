@@ -1,8 +1,8 @@
 # Turbo Track
 
-A top-down racing game for iPhone and iPad, made as a birthday present. Pick a big or small car, paint it, choose a track, and dodge the bombs and cracks. Birthday mode turns the bombs into cakes.
+A top-down racing game for iPhone and iPad, made as a birthday present. Pick a big or small car, paint it, choose a track, and dodge the bombs and cracks. Birthday mode turns the bombs into cakes. Designed by Christopher Yong.
 
-Play it at https://dixon-legalled.github.io/turbo-track/ and install it with Share → Add to Home Screen in Safari.
+Install it from https://dixon-legalled.github.io/turbo-track/ with Share → Add to Home Screen. The game only runs from the home screen; opened in a browser tab, the site shows the install page.
 
 ## Making changes
 

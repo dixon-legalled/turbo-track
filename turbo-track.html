@@ -1449,5 +1449,7 @@ function start(data){
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (!screens.tracks.hidden) refreshTracks(); });
   requestAnimationFrame(t => { last = t; frame(t); });
 }
-window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+// The hosted site sets TT_GATE when it is opened in a browser tab instead of from the home screen;
+// it shows its install page then and the game does not start.
+if (!window.TT_GATE) window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
 </script>
