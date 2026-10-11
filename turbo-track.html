@@ -522,7 +522,7 @@ const Sound = {
   },
   noise(dur, o = {}){
     if (!this.ctx) return;
-    const t0 = this.ctx.currentTime, src = this.ctx.createBufferSource(), f = this.ctx.createBiquadFilter(), g = this.ctx.createGain();
+    const t0 = this.ctx.currentTime + (o.at || 0), src = this.ctx.createBufferSource(), f = this.ctx.createBiquadFilter(), g = this.ctx.createGain();
     src.buffer = this.noiseBuf; f.type = 'lowpass'; f.frequency.setValueAtTime(o.freq || 1200, t0); f.frequency.exponentialRampToValueAtTime(80, t0 + dur);
     g.gain.setValueAtTime(o.vol || .3, t0); g.gain.exponentialRampToValueAtTime(.0001, t0 + dur);
     src.connect(f); f.connect(g); g.connect(this.out); src.start(t0); src.stop(t0 + dur + .05);
@@ -557,6 +557,45 @@ const Sound = {
   },
 };
 ['touchend','pointerdown','click','keydown'].forEach(ev => document.addEventListener(ev, () => Sound.ensure(), { capture:true, passive:true }));
+
+/* ---------- menu music: an original 8-bar chiptune loop (C, Am, F, G), scheduled a little ahead each frame ---------- */
+const Music = {
+  on:false, step:0, next:0, STEP:60 / 132 / 4,          // 132 bpm, sixteenth-note steps, 128 steps per loop
+  // lead: "note:startStep:lengthInSteps" per bar
+  LEAD: [
+    'E5:0:2 G5:2:2 C6:4:2 G5:6:2 A5:8:3 G5:11:1 E5:12:4',
+    'D5:0:2 E5:2:2 G5:4:4 E5:8:2 D5:10:2 C5:12:4',
+    'A4:0:2 C5:2:2 E5:4:2 A5:6:2 G5:8:3 E5:11:1 C5:12:4',
+    'B4:0:2 C5:2:2 E5:4:4 D5:8:2 C5:10:2 A4:12:4',
+    'A4:0:2 C5:2:2 F5:4:2 A5:6:2 G5:8:2 F5:10:2 E5:12:4',
+    'F5:0:2 E5:2:2 D5:4:4 C5:8:2 D5:10:2 F5:12:4',
+    'G5:0:2 F5:2:2 E5:4:2 D5:6:2 B4:8:2 D5:10:2 G5:12:4',
+    'B5:0:2 A5:2:2 G5:4:2 F5:6:2 E5:8:2 D5:10:2 B4:12:2 D5:14:2',
+  ],
+  BASS: [48, 48, 45, 45, 41, 41, 43, 43],                 // MIDI roots: C3 C3 A2 A2 F2 F2 G2 G2
+  midi(name){ const n = { C:0, D:2, E:4, F:5, G:7, A:9, B:11 }[name[0]]; return 12 * (+name.slice(1) + 1) + n; },
+  hz(m){ return 440 * Math.pow(2, (m - 69) / 12); },
+  start(){ if (this.on || !Sound.ctx) return; this.on = true; this.step = 0; this.next = Sound.ctx.currentTime + .08; },
+  stop(){ this.on = false; },
+  tick(){
+    if (!this.on || !Sound.ctx) return;
+    const now = Sound.ctx.currentTime;
+    if (this.next < now - .3) this.next = now + .05;     // catch up after the app was in the background
+    while (this.next < now + .25){ this.play(this.step, this.next - now); this.step = (this.step + 1) % 128; this.next += this.STEP; }
+  },
+  play(step, at){
+    const bar = step >> 4, s = step & 15, S = this.STEP;
+    for (const ev of this.lead[bar]) if (ev.s === s){
+      Sound.tone(ev.f, ev.len * S * .9, { type:'square', vol:.04, at });
+      Sound.tone(ev.f * 2, ev.len * S * .5, { type:'triangle', vol:.02, at });
+    }
+    if (!(s & 1)) Sound.tone(this.hz(this.BASS[bar] + (s % 4 === 2 ? 12 : 0)), S * 1.7, { type:'triangle', vol:.11, at });
+    if (s % 8 === 0) Sound.tone(150, .14, { type:'sine', to:45, vol:.2, at });
+    if (s === 4 || s === 12) Sound.noise(.12, { vol:.12, freq:2600, at });
+    if (s % 4 === 2) Sound.noise(.035, { vol:.05, freq:9000, at });
+  },
+};
+Music.lead = Music.LEAD.map(bar => bar.split(' ').map(t => { const [n, s, len] = t.split(':'); return { f:Music.hz(Music.midi(n)), s:+s, len:+len }; }));
 
 /* ================= drawing primitives ================= */
 function rr(ctx, x, y, w, h, r){ r = Math.min(r, w / 2, h / 2); ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
@@ -1164,6 +1203,7 @@ function finishRace(){
   burstConfetti(G.bday ? 220 : (G.place === 1 ? 140 : 60));
   if (G.bday) Sound.birthday(); else Sound.fanfare();
   G.resultsAt = G.t + 1.8;
+  G.musicAt = G.t + (G.bday ? 10 : 2.5);   // let the Happy Birthday song or fanfare finish first
   releaseWakeLock();
 }
 function updateFx(dt){
@@ -1189,6 +1229,10 @@ function updateCam(dt){
 function update(dt){
   G.t += dt;
   const st = G.state;
+  // Menu music plays everywhere except a race in progress (and waits for the finish jingle on the results).
+  const wantMusic = settings.sound && (st === 'menu' || st === 'paused' || (st === 'finished' && !screens.results.hidden && G.t >= G.musicAt));
+  if (wantMusic) Music.start(); else Music.stop();
+  Music.tick();
   if (st === 'paused') return;
   if (st === 'countdown'){
     const prev = Math.ceil(G.countdown); G.countdown -= dt; const now = Math.ceil(G.countdown);
