@@ -1,5 +1,5 @@
 // Offline support. The version changes on every build so phones pick up updates.
-const CACHE = 'turbo-track-692dec2dc0';
+const CACHE = 'turbo-track-e266dd147b';
 const CORE = ['./', 'index.html', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png'];
 
 self.addEventListener('install', e => {

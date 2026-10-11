@@ -42,32 +42,24 @@ html.gate #landing{display:flex;min-height:100vh;min-height:100dvh;color:#FFF2FA
 .lp-logo span:last-child{color:#FFF2FA;text-shadow:0 6px 0 #6B33A3,0 12px 0 rgba(0,0,0,.35)}
 .lp-checker{height:16px;width:220px;max-width:70%;transform:skew(-9deg);border-radius:3px;background:repeating-conic-gradient(#fff 0 25%,#16161c 0 50%) 0 0/16px 16px}
 .lp-tag{margin:0;font-size:18px;line-height:1.4;max-width:32ch;text-wrap:balance}
-.lp-btn{font-family:var(--display);font-size:24px;color:#4A1F73;background:#FFD84D;border:0;border-radius:20px;padding:15px 30px;box-shadow:0 6px 0 #D9A400;display:flex;align-items:center;gap:10px;cursor:pointer}
-.lp-btn:active{transform:translateY(4px);box-shadow:0 2px 0 #D9A400}
-.lp-btn svg{width:26px;height:26px}
-.lp-status{margin:0;font-weight:800;color:#FFD84D;max-width:34ch;text-wrap:balance}
-.lp-steps{list-style:none;margin:0;padding:16px;display:flex;flex-direction:column;gap:12px;text-align:left;width:100%;background:#6B33A3;border-radius:20px;box-shadow:0 8px 0 rgba(0,0,0,.28)}
-.lp-steps li{display:flex;gap:12px;align-items:flex-start;line-height:1.4;font-size:17px}
-.lp-n{flex:none;width:30px;height:30px;border-radius:50%;background:#FFD84D;color:#4A1F73;font-family:var(--display);display:flex;align-items:center;justify-content:center;font-size:17px}
-.lp-steps svg{width:20px;height:20px;vertical-align:-4px;margin:0 2px}
-.lp-steps.flash{animation:lpflash .6s ease-out}
-@keyframes lpflash{0%{transform:scale(.96);box-shadow:0 0 0 6px #FFD84D}100%{transform:scale(1)}}
-.lp-credit{margin:8px 0 0;font-size:16px;letter-spacing:.02em;opacity:.92}
+.lp-credit{margin:-4px 0 4px;font-size:16px;letter-spacing:.02em;opacity:.92}
 .lp-credit b{font-family:var(--display);font-weight:400;font-size:19px;color:#FFD84D;letter-spacing:.01em}
+.lp-steps{list-style:none;margin:0;padding:16px 18px;display:flex;flex-direction:column;gap:12px;text-align:left;width:100%;background:#6B33A3;border-radius:20px;box-shadow:0 8px 0 rgba(0,0,0,.28)}
+.lp-steps li{display:flex;gap:12px;align-items:center;line-height:1.3;font-size:18px}
+.lp-n{flex:none;width:30px;height:30px;border-radius:50%;background:#FFD84D;color:#4A1F73;font-family:var(--display);display:flex;align-items:center;justify-content:center;font-size:17px}
+.lp-steps svg{width:22px;height:22px;vertical-align:-5px;margin-left:4px}
 @media (orientation:landscape) and (max-height:520px){
-  html.gate #landing{padding-top:max(12px,env(safe-area-inset-top,0px));padding-bottom:max(12px,env(safe-area-inset-bottom,0px))}
-  .lp{max-width:800px;display:grid;grid-template-columns:1fr 1fr;column-gap:28px;row-gap:12px;justify-items:center;align-items:center;
-    grid-template-areas:"icon tag" "logo btn" "check status" "steps steps" "credit credit"}
+  html.gate #landing{padding-top:max(14px,env(safe-area-inset-top,0px));padding-bottom:max(14px,env(safe-area-inset-bottom,0px))}
+  .lp{max-width:800px;display:grid;grid-template-columns:1fr 1fr;column-gap:28px;row-gap:10px;justify-items:center;align-items:center;
+    grid-template-areas:"icon tag" "logo credit" "check steps"}
   .lp-icon{grid-area:icon;width:84px;height:84px}
   .lp-logo{grid-area:logo}
   .lp-logo span{font-size:48px}
-  .lp-checker{grid-area:check}
+  .lp-checker{grid-area:check;align-self:start}
   .lp-tag{grid-area:tag;font-size:16px}
-  .lp-btn{grid-area:btn;font-size:21px;padding:12px 24px}
-  .lp-status{grid-area:status;font-size:15px}
-  .lp-steps{grid-area:steps;flex-direction:row;padding:12px}
-  .lp-steps li{flex:1;font-size:15px}
   .lp-credit{grid-area:credit;margin:0}
+  .lp-steps{grid-area:steps;padding:12px 16px;gap:8px}
+  .lp-steps li{font-size:16px}
 }
 </style>`;
 
@@ -80,41 +72,14 @@ const LANDING = `<main id="landing">
     <h1 class="lp-logo"><span>Turbo</span><span>Track</span></h1>
     <div class="lp-checker"></div>
     <p class="lp-tag">A racing game for iPhone and iPad. Pick a big or small car, paint it, choose a track and dodge the bombs and cracks.</p>
-    <button id="lp-install" class="lp-btn">${ADD_SVG}<span>Add to Home Screen</span></button>
-    <p id="lp-status" class="lp-status" hidden></p>
-    <ol id="lp-steps" class="lp-steps" hidden>
-      <li><span class="lp-n">1</span><span>Tap the <b>Share</b> button ${SHARE_SVG} in your browser. On iPhone you may need to tap <b>&middot;&middot;&middot;</b> first.</span></li>
-      <li><span class="lp-n">2</span><span>Scroll down and tap <b>Add to Home Screen</b> ${ADD_SVG}</span></li>
-      <li><span class="lp-n">3</span><span>Leave <b>Open as Web App</b> switched on and tap <b>Add</b>. Then open Turbo Track from your home screen.</span></li>
-    </ol>
     <p class="lp-credit">Designed by <b>Christopher Yong</b></p>
+    <ol class="lp-steps" aria-label="How to install">
+      <li><span class="lp-n">1</span><span>Tap <b>Share</b>${SHARE_SVG}</span></li>
+      <li><span class="lp-n">2</span><span>Tap <b>Add to Home Screen</b>${ADD_SVG}</span></li>
+      <li><span class="lp-n">3</span><span>Open <b>Turbo Track</b> from your home screen</span></li>
+    </ol>
   </div>
-</main>
-<script>
-(function(){
-  if (!window.TT_GATE) return;
-  var btn = document.getElementById('lp-install'), steps = document.getElementById('lp-steps'), status = document.getElementById('lp-status');
-  var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  var prompt = null;
-  function say(t){ status.textContent = t; status.hidden = !t; }
-  // Android and desktop Chrome can install in one tap; iPhone and iPad only allow Share > Add to Home Screen.
-  window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); prompt = e; });
-  window.addEventListener('appinstalled', function(){ steps.hidden = true; say('Installed! Open Turbo Track from your home screen.'); });
-  if (isIOS) steps.hidden = false;
-  btn.addEventListener('click', function(){
-    if (prompt){
-      prompt.prompt();
-      prompt.userChoice.then(function(c){ if (c.outcome === 'accepted'){ steps.hidden = true; say('Installed! Open Turbo Track from your home screen.'); } });
-      prompt = null; return;
-    }
-    if (!isIOS){ say('Open your browser\\'s menu and choose Install app or Add to Home Screen.'); return; }
-    steps.hidden = false;
-    say('Apple only lets you add games from the Share menu. Follow these 3 steps:');
-    steps.classList.remove('flash'); void steps.offsetWidth; steps.classList.add('flash');
-    steps.scrollIntoView({ behavior:'smooth', block:'center' });
-  });
-})();
-</script>`;
+</main>`;
 
 const html = `<!doctype html>
 <html lang="en">
