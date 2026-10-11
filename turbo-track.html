@@ -22,7 +22,7 @@ html{height:100%;box-sizing:border-box;background:var(--ink)}
 [hidden]{display:none!important}
 body{height:100%;margin:0;overflow:hidden;background:var(--ink);color:var(--paper);font-family:var(--body);font-size:17px;
   -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;overscroll-behavior:none}
-#app{position:fixed;top:0;left:0;width:100%;height:100%;overflow:hidden;container-type:size;
+#app{position:absolute;top:0;left:0;width:100%;height:100%;overflow:hidden;container-type:size;
   --sa-t:env(safe-area-inset-top,0px);--sa-r:env(safe-area-inset-right,0px);--sa-b:env(safe-area-inset-bottom,0px);--sa-l:env(safe-area-inset-left,0px)}
 /* A phone held upright still gets the landscape game: the whole app is drawn a quarter turn clockwise,
    so the safe-area edges move round with it. Width and height are set in pixels by resize(). */
@@ -1460,6 +1460,9 @@ function resize(){
   app.classList.toggle('turned', turn);
   app.style.width = (turn ? vp.h : vp.w) + 'px';
   app.style.height = (turn ? vp.w : vp.h) + 'px';
+  // iOS 26 home-screen apps draw page content (but not fixed layers) into the strip they leave out of the
+  // reported viewport, so the page itself is made exactly screen-sized.
+  for (const el of [document.documentElement, document.body]){ el.style.width = vp.w + 'px'; el.style.height = vp.h + 'px'; }
   view.turned = turn;
   view.w = Math.max(200, app.offsetWidth); view.h = Math.max(200, app.offsetHeight); view.dpr = Math.min(2, window.devicePixelRatio || 1);
   const land = view.w > view.h;
